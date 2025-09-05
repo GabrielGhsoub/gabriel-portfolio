@@ -1,12 +1,7 @@
-import { Layout } from './components/layout';
-import { Home } from './pages';
+import { Portfolio } from './pages';
 
 function App() {
-  return (
-    <Layout>
-      <Home />
-    </Layout>
-  );
+  return <Portfolio />;
 }
 
 export default App;
