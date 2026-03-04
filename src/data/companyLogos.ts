@@ -7,20 +7,22 @@ import blomBankLogo from '../assets/images/companies/Blom-bank.jpg';
 import bbaLogo from '../assets/images/companies/BBA icon.png';
 
 export const companyLogos: Record<string, string> = {
+  Speedlane: '',
   'Lawyers Syndicate': bbaLogo,
   Bcom: bcomLogo,
   'GCG (Ghoussoub Consulting Group)': gcgLogo,
-  'Inspire Innovations': inspireLogo,
+  'EmblemHealth (via Inspire Innovations)': inspireLogo,
   'WonderEight Agency': wonderEightLogo,
   'Blom Bank': blomBankLogo,
 };
 
 export const companyLinkedInUrls: Record<string, string> = {
+  Speedlane: 'https://www.linkedin.com/company/speedlane',
   'Lawyers Syndicate': 'https://www.bba24.org/',
   Bcom: 'https://www.linkedin.com/company/bcom/posts/?feedView=all',
   'GCG (Ghoussoub Consulting Group)':
     'https://www.linkedin.com/company/gcginnovate/posts/?feedView=all',
-  'Inspire Innovations':
+  'EmblemHealth (via Inspire Innovations)':
     'https://www.linkedin.com/company/inspire-innovations/posts/?feedView=all',
   'WonderEight Agency':
     'https://www.linkedin.com/company/wondereight/posts/?feedView=all',

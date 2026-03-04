@@ -1,30 +1,36 @@
 export const personalInfo = {
   name: 'Gabriel Ghoussoub',
-  title: 'Senior Software Engineer',
+  title: 'Full-Stack Software Engineer',
   email: 'ghoussoubgabriel@gmail.com',
   phone: '+961 81 398 752',
   linkedin: 'linkedin.com/in/gabriel-ghoussoub',
   github: 'github.com/GabrielGhsoub',
   location: 'Beirut, Lebanon',
-  summary: `Senior Software Engineer with over 4 years of experience in architecting and delivering scalable full-stack applications. Specializes in Java (Spring, WebFlux) and modern frontend frameworks like React and Angular. Proven track record of leading cross-functional teams, driving CI/CD adoption, and optimizing system performance to achieve key business objectives.`,
+  summary: `Full-stack Software Engineer with 5+ years of experience architecting and delivering scalable distributed applications. Specialized in Java (Spring Boot, WebFlux) and modern frontend frameworks including React and Angular. Led cross-functional teams of up to 5 engineers, reduced deployment times by 93%, and achieved 99.95% system uptime through CI/CD implementation and performance optimization.`,
 };
 
 export const skills = {
-  languages: ['Java', 'JavaScript', 'TypeScript', 'Python', 'SQL'],
+  languages: ['Java', 'JavaScript', 'TypeScript', 'Python', 'SQL', 'Elixir'],
   frameworks: [
     'Spring Boot',
     'Spring WebFlux',
     'React',
-    'Angular',
+    'Node.js',
+    'NestJS',
+    'GraphQL',
     'Hibernate',
     'JUnit',
     'Mockito',
   ],
   cloud: [
+    'AWS',
     'Jenkins',
     'Docker',
     'Kubernetes',
     'Azure DevOps',
+    'GitLab',
+    'Terraform',
+    'Infrastructure as Code (IaC)',
     'CI/CD',
     'Helm',
     'VPS',
@@ -38,14 +44,25 @@ export const skills = {
     'H2',
     'Redis',
   ],
-  tools: ['Git', 'Jira', 'Agile', 'Scrum', 'Postman', 'TDD'],
+  tools: ['Git', 'GitLab', 'Linux', 'Jira', 'Agile', 'Scrum', 'Postman', 'TDD'],
 };
 
 export const experience = [
   {
+    title: 'Software Engineer',
+    company: 'Speedlane',
+    period: 'Aug. 2025 – Present',
+    highlights: [
+      'Engineered scalable backend services and RESTful/GraphQL APIs using Node.js, TypeScript, Elixir, and NestJS, supporting high-throughput distributed systems.',
+      'Developed full-stack applications with Java Spring Boot and React, delivering end-to-end features across microservice architectures.',
+      'Automated cloud infrastructure provisioning with Terraform and streamlined CI/CD pipelines through GitLab, accelerating release cycles and improving deployment reliability.',
+    ],
+    skills: ['Full-Stack', 'GraphQL', 'DevOps'],
+  },
+  {
     title: 'Senior Software Engineer',
     company: 'Lawyers Syndicate',
-    period: 'May 2025 – Present',
+    period: 'May 2025 – Aug. 2025',
     highlights: [
       'Spearheaded the end-to-end development of a national digital identity card for the Lawyers Syndicate, leading a cross-functional team of 5 engineers, QAs, and designers.',
       'Architected a secure, dual-purpose digital card solution integrating banking functionalities (e-wallet, fee payments) and identity/access control using Java and React.',
@@ -74,8 +91,8 @@ export const experience = [
   },
   {
     title: 'Java Software Engineer',
-    company: 'Inspire Innovations',
-    period: 'Nov. 2022 – Jan. 2024',
+    company: 'EmblemHealth (via Inspire Innovations)',
+    period: 'Nov. 2022 – Jun. 2024',
     highlights: [
       'Developed scalable microservices using Spring Boot and orchestrated their deployment with Kubernetes, reducing deployment times from 4 hours to 15 minutes and increasing uptime to 99.95%.',
       'Authored a comprehensive test suite (JUnit, Mockito) that achieved 90% code coverage, resulting in a 60% reduction in post-deployment bugs and enhancing application reliability.',
