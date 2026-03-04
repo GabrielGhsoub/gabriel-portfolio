@@ -29,6 +29,7 @@ interface PersonalProject {
   gradient: string;
   glowColor: string;
   screenshots: string[];
+  screenshotAspect?: 'portrait' | 'landscape';
   link?: string;
   linkLabel?: string;
 }
@@ -127,7 +128,8 @@ const personalProjects: PersonalProject[] = [
     icon: Headset,
     gradient: 'from-rose-500 to-pink-500',
     glowColor: 'rgba(244, 63, 94, 0.2)',
-    screenshots: ['/projects/salsa/icon.png'],
+    screenshots: ['/projects/salsa/quest3.jpg'],
+    screenshotAspect: 'landscape',
   },
 ];
 
@@ -192,18 +194,26 @@ const professionalProjects: ProfessionalProject[] = [
 const ScreenshotCarousel = ({
   screenshots,
   title,
+  aspect = 'portrait',
 }: {
   screenshots: string[];
   title: string;
+  aspect?: 'portrait' | 'landscape';
 }) => {
   const [current, setCurrent] = useState(0);
 
   if (screenshots.length === 0) return null;
 
   const isSingleImage = screenshots.length === 1;
+  const aspectClass =
+    aspect === 'landscape'
+      ? 'aspect-[16/10] max-h-[350px]'
+      : 'aspect-[9/16] max-h-[420px]';
 
   return (
-    <div className="relative w-full aspect-[9/16] max-h-[420px] bg-slate-900/80 rounded-xl overflow-hidden group/carousel">
+    <div
+      className={`relative w-full ${aspectClass} bg-slate-900/80 rounded-xl overflow-hidden group/carousel`}
+    >
       <AnimatePresence mode="wait">
         <motion.img
           key={current}
@@ -297,6 +307,7 @@ const PersonalProjectCard = ({
             <ScreenshotCarousel
               screenshots={project.screenshots}
               title={project.title}
+              aspect={project.screenshotAspect ?? 'portrait'}
             />
           </div>
 
