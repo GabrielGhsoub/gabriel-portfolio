@@ -14,8 +14,8 @@ import {
 const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'about', label: 'About', icon: User },
-  { id: 'skills', label: 'Skills', icon: Award },
   { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'skills', label: 'Skills', icon: Award },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'contact', label: 'Contact', icon: MessageCircle },
 ];

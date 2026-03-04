@@ -79,9 +79,9 @@ const personalProjects: PersonalProject[] = [
     linkLabel: 'View on App Store',
   },
   {
-    title: 'NipperMan — AI Fitness Coach',
+    title: 'NipperMan',
     description:
-      'An offline-first AI-powered workout companion built around a 12-week hypertrophy program. Features agentic AI that can modify workouts in real-time, vision-based nutrition logging via photo analysis, and a persistent AI coach with full training context.',
+      'A personal offline-first AI-powered workout companion built around a 12-week hypertrophy program. Not for distribution. Features agentic AI that can modify workouts in real-time, vision-based nutrition logging via photo analysis, and a persistent AI coach with full training context.',
     tech: [
       'React Native',
       'Expo',
@@ -108,7 +108,7 @@ const personalProjects: PersonalProject[] = [
     ],
   },
   {
-    title: 'Salsa VR — Dance Trainer',
+    title: 'Salsa VR',
     description:
       'A Meta Quest 3 VR salsa dancing trainer built in Godot 4.5. Uses OpenXR hand tracking to evaluate timing accuracy on every beat of 8-count salsa phrases, with real-time scoring, ghost hand indicators, floor footwork guides, and a procedurally generated neon club environment.',
     tech: [
@@ -526,7 +526,7 @@ export const Projects = () => {
             </h2>
           </div>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            From published mobile apps to enterprise platforms — projects I've
+            From published mobile apps to enterprise platforms, projects I've
             built end-to-end
           </p>
         </motion.div>

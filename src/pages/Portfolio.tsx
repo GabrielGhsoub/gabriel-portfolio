@@ -30,14 +30,14 @@ export const Portfolio = () => {
 
         <SectionDivider />
 
-        <section id="skills">
-          <Skills />
+        <section id="projects">
+          <Projects />
         </section>
 
         <SectionDivider />
 
-        <section id="projects">
-          <Projects />
+        <section id="skills">
+          <Skills />
         </section>
 
         <SectionDivider />
