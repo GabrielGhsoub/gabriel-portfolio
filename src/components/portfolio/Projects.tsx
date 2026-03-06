@@ -494,7 +494,7 @@ export const Projects = () => {
   });
 
   const [activeTab, setActiveTab] = useState<'personal' | 'professional'>(
-    'personal'
+    'professional'
   );
 
   return (
@@ -540,17 +540,6 @@ export const Projects = () => {
         >
           <div className="inline-flex rounded-2xl bg-slate-800/70 border border-gray-700/50 p-1.5">
             <button
-              onClick={() => setActiveTab('personal')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
-                activeTab === 'personal'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <AppWindow size={16} />
-              Personal Apps
-            </button>
-            <button
               onClick={() => setActiveTab('professional')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeTab === 'professional'
@@ -560,6 +549,17 @@ export const Projects = () => {
             >
               <Briefcase size={16} />
               Professional Work
+            </button>
+            <button
+              onClick={() => setActiveTab('personal')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
+                activeTab === 'personal'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/20'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <AppWindow size={16} />
+              Personal Apps
             </button>
           </div>
         </motion.div>
