@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback } from 'react';
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import {
   Layers,
@@ -192,20 +192,18 @@ const professionalProjects: ProfessionalProject[] = [
 ];
 
 const PhoneFrame = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative mx-auto" style={{ width: '220px' }}>
-    {/* Phone bezel */}
-    <div className="relative rounded-[2.5rem] border-[6px] border-gray-700/80 bg-black shadow-2xl shadow-black/50 overflow-hidden">
-      {/* Notch / Dynamic Island */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-b-2xl z-20" />
-      {/* Screen content */}
+  <div className="relative mx-auto w-[180px] sm:w-[220px]">
+    <div className="relative rounded-[2rem] sm:rounded-[2.5rem] border-[5px] sm:border-[6px] border-gray-700/80 bg-black shadow-2xl shadow-black/50 overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 sm:w-20 h-4 sm:h-5 bg-black rounded-b-xl sm:rounded-b-2xl z-20" />
       <div className="relative aspect-[9/19.5] overflow-hidden bg-black">
         {children}
       </div>
-      {/* Home indicator */}
-      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-gray-600 rounded-full z-20" />
+      <div className="absolute bottom-1 sm:bottom-1.5 left-1/2 -translate-x-1/2 w-20 sm:w-24 h-1 bg-gray-600 rounded-full z-20" />
     </div>
   </div>
 );
+
+const SWIPE_THRESHOLD = 50;
 
 const ScreenshotCarousel = ({
   screenshots,
@@ -217,24 +215,55 @@ const ScreenshotCarousel = ({
   aspect?: 'portrait' | 'landscape';
 }) => {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const paginate = useCallback(
+    (dir: number) => {
+      setDirection(dir);
+      setCurrent((prev) => {
+        if (dir === 1) return prev === screenshots.length - 1 ? 0 : prev + 1;
+        return prev === 0 ? screenshots.length - 1 : prev - 1;
+      });
+    },
+    [screenshots.length]
+  );
+
+  const handleDragEnd = useCallback(
+    (_: unknown, info: PanInfo) => {
+      if (info.offset.x < -SWIPE_THRESHOLD) {
+        paginate(1);
+      } else if (info.offset.x > SWIPE_THRESHOLD) {
+        paginate(-1);
+      }
+    },
+    [paginate]
+  );
 
   if (screenshots.length === 0) return null;
 
   const isSingleImage = screenshots.length === 1;
   const isLandscape = aspect === 'landscape';
 
+  const slideVariants = {
+    enter: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0 }),
+  };
+
   if (isLandscape) {
     return (
-      <div className="relative w-full aspect-[16/10] max-h-[350px] bg-slate-900/80 rounded-xl overflow-hidden group/carousel">
-        <AnimatePresence mode="wait">
+      <div className="relative w-full aspect-[16/10] max-h-[350px] bg-slate-900/80 rounded-xl overflow-hidden">
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.img
             key={current}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             src={screenshots[current]}
             alt={`${title} screenshot ${current + 1}`}
             className="w-full h-full object-contain"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           />
         </AnimatePresence>
@@ -243,17 +272,24 @@ const ScreenshotCarousel = ({
   }
 
   return (
-    <div className="relative group/carousel py-4">
+    <div className="relative group/carousel py-2 sm:py-4 touch-pan-y">
       <PhoneFrame>
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.img
             key={current}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            drag={isSingleImage ? false : 'x'}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={handleDragEnd}
             src={screenshots[current]}
             alt={`${title} screenshot ${current + 1}`}
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            className="w-full h-full object-cover select-none"
+            style={{ touchAction: 'pan-y' }}
             transition={{ duration: 0.3 }}
           />
         </AnimatePresence>
@@ -262,31 +298,30 @@ const ScreenshotCarousel = ({
       {!isSingleImage && (
         <>
           <button
-            onClick={() =>
-              setCurrent((p) => (p === 0 ? screenshots.length - 1 : p - 1))
-            }
-            className="absolute left-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10"
+            onClick={() => paginate(-1)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10 hidden sm:block"
           >
             <ChevronLeft size={18} />
           </button>
           <button
-            onClick={() =>
-              setCurrent((p) => (p === screenshots.length - 1 ? 0 : p + 1))
-            }
-            className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10"
+            onClick={() => paginate(1)}
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10 hidden sm:block"
           >
             <ChevronRight size={18} />
           </button>
 
-          <div className="flex justify-center gap-1.5 mt-4">
+          <div className="flex justify-center gap-2 mt-3 sm:mt-4">
             {screenshots.map((_, i) => (
               <button
                 key={i}
-                onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-all cursor-pointer ${
+                onClick={() => {
+                  setDirection(i > current ? 1 : -1);
+                  setCurrent(i);
+                }}
+                className={`h-2 rounded-full transition-all cursor-pointer ${
                   i === current
-                    ? 'bg-white w-5'
-                    : 'bg-white/40 hover:bg-white/60'
+                    ? 'bg-white w-6'
+                    : 'bg-white/40 hover:bg-white/60 w-2'
                 }`}
               />
             ))}
@@ -328,14 +363,14 @@ const PersonalProjectCard = ({
         }}
       />
 
-      <div className="relative bg-slate-800/60 backdrop-blur-sm rounded-3xl border border-gray-700/40 group-hover:border-gray-500/40 transition-all duration-500 overflow-hidden">
+      <div className="relative bg-slate-800/60 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-700/40 group-hover:border-gray-500/40 transition-all duration-500 overflow-hidden">
         <div
           className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${project.gradient}`}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
           {/* Screenshot Carousel */}
-          <div className="p-6 flex items-center justify-center bg-slate-900/30">
+          <div className="p-4 sm:p-6 flex items-center justify-center bg-slate-900/30">
             <ScreenshotCarousel
               screenshots={project.screenshots}
               title={project.title}
@@ -344,28 +379,29 @@ const PersonalProjectCard = ({
           </div>
 
           {/* Content */}
-          <div className="p-6 lg:p-8 flex flex-col justify-center">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               <motion.div
-                className={`p-2.5 rounded-xl bg-gradient-to-br ${project.gradient} shadow-lg`}
+                className={`p-2 sm:p-2.5 rounded-xl bg-gradient-to-br ${project.gradient} shadow-lg`}
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: 'spring' as const, stiffness: 300 }}
               >
-                <IconComponent size={22} className="text-white" />
+                <IconComponent
+                  size={20}
+                  className="text-white sm:w-[22px] sm:h-[22px]"
+                />
               </motion.div>
-              <div>
-                <h3 className="text-2xl font-bold text-white">
-                  {project.title}
-                </h3>
-              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">
+                {project.title}
+              </h3>
             </div>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+            <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-5">
               {project.description}
             </p>
 
             {/* Highlights */}
-            <div className="space-y-2 mb-5">
+            <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5">
               {project.highlights.map((highlight, i) => (
                 <motion.div
                   key={i}
@@ -374,7 +410,7 @@ const PersonalProjectCard = ({
                     inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }
                   }
                   transition={{ delay: index * 0.2 + i * 0.1 + 0.3 }}
-                  className="flex items-start gap-2 text-sm"
+                  className="flex items-start gap-2 text-xs sm:text-sm"
                 >
                   <span
                     className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-gradient-to-r ${project.gradient} flex-shrink-0`}
@@ -385,14 +421,14 @@ const PersonalProjectCard = ({
             </div>
 
             {/* Tech Stack */}
-            <div className="mb-5">
+            <div className="mb-4 sm:mb-5">
               <div className="flex items-center gap-2 mb-2">
                 <Code2 size={13} className="text-gray-500" />
                 <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tech Stack
                 </span>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {project.tech.map((tech, i) => (
                   <motion.span
                     key={tech}
@@ -407,7 +443,7 @@ const PersonalProjectCard = ({
                       type: 'spring' as const,
                       stiffness: 200,
                     }}
-                    className="px-3 py-1.5 bg-gray-700/40 text-gray-300 text-xs font-medium rounded-lg border border-gray-600/30 hover:border-gray-500/50 hover:bg-gray-700/60 transition-all duration-200"
+                    className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700/40 text-gray-300 text-[11px] sm:text-xs font-medium rounded-lg border border-gray-600/30 hover:border-gray-500/50 hover:bg-gray-700/60 transition-all duration-200"
                     whileHover={{ scale: 1.05, y: -1 }}
                   >
                     {tech}
@@ -472,13 +508,13 @@ const ProfessionalProjectCard = ({
         }}
       />
 
-      <div className="relative bg-slate-800/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 group-hover:border-gray-500/50 transition-all duration-500 overflow-hidden h-full flex flex-col p-6">
+      <div className="relative bg-slate-800/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 group-hover:border-gray-500/50 transition-all duration-500 overflow-hidden h-full flex flex-col p-4 sm:p-6">
         <div
           className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${project.gradient}`}
         />
 
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-white/5 text-white/80 border border-white/10">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-white/5 text-white/80 border border-white/10">
             <Layers size={12} />
             {project.category}
           </span>
@@ -491,11 +527,11 @@ const ProfessionalProjectCard = ({
           </motion.div>
         </div>
 
-        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-cyan-400 transition-all duration-300">
+        <h3 className="text-base sm:text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-cyan-400 transition-all duration-300">
           {project.title}
         </h3>
 
-        <p className="text-gray-400 text-sm leading-relaxed mb-4 flex-1">
+        <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 flex-1">
           {project.description}
         </p>
 
@@ -503,7 +539,7 @@ const ProfessionalProjectCard = ({
           {project.tech.map((tech) => (
             <span
               key={tech}
-              className="px-2.5 py-1 bg-gray-700/40 text-gray-400 text-xs font-medium rounded-md border border-gray-600/30"
+              className="px-2 sm:px-2.5 py-1 bg-gray-700/40 text-gray-400 text-[11px] sm:text-xs font-medium rounded-md border border-gray-600/30"
             >
               {tech}
             </span>
@@ -530,7 +566,7 @@ export const Projects = () => {
   );
 
   return (
-    <section className="py-20 bg-gradient-to-b from-slate-800 to-slate-900 relative overflow-hidden">
+    <section className="py-12 sm:py-20 bg-gradient-to-b from-slate-800 to-slate-900 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-20 right-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl" />
@@ -549,15 +585,15 @@ export const Projects = () => {
           initial={{ opacity: 0, y: -30 }}
           animate={titleInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -30 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="text-cyan-500" size={32} />
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
+            <Sparkles className="text-cyan-500" size={28} />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
               Featured Projects
             </h2>
           </div>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
             From published mobile apps to enterprise platforms, projects I've
             built end-to-end
           </p>
@@ -568,29 +604,29 @@ export const Projects = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={titleInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 0.3 }}
-          className="flex justify-center mb-12"
+          className="flex justify-center mb-8 sm:mb-12"
         >
-          <div className="inline-flex rounded-2xl bg-slate-800/70 border border-gray-700/50 p-1.5">
+          <div className="inline-flex rounded-2xl bg-slate-800/70 border border-gray-700/50 p-1 sm:p-1.5">
             <button
               onClick={() => setActiveTab('professional')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeTab === 'professional'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/20'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Briefcase size={16} />
+              <Briefcase size={14} className="sm:w-4 sm:h-4" />
               Professional Work
             </button>
             <button
               onClick={() => setActiveTab('personal')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer ${
                 activeTab === 'personal'
                   ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/20'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <AppWindow size={16} />
+              <AppWindow size={14} className="sm:w-4 sm:h-4" />
               Personal Apps
             </button>
           </div>
@@ -605,7 +641,7 @@ export const Projects = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="space-y-8 max-w-6xl mx-auto"
+              className="space-y-6 sm:space-y-8 max-w-6xl mx-auto"
             >
               {personalProjects.map((project, index) => (
                 <PersonalProjectCard
@@ -623,7 +659,7 @@ export const Projects = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-7xl mx-auto"
+              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 max-w-7xl mx-auto"
             >
               {professionalProjects.map((project, index) => (
                 <ProfessionalProjectCard
@@ -639,7 +675,7 @@ export const Projects = () => {
         {/* Bottom accent */}
         <motion.div
           ref={proRef}
-          className="mt-16 text-center"
+          className="mt-10 sm:mt-16 text-center"
           initial={{ opacity: 0 }}
           animate={proInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
