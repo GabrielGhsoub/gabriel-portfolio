@@ -67,8 +67,8 @@ const personalProjects: PersonalProject[] = [
       'Admin panel with React + shadcn/ui',
     ],
     icon: Smartphone,
-    gradient: 'from-green-500 to-emerald-500',
-    glowColor: 'rgba(16, 185, 129, 0.2)',
+    gradient: 'from-orange-500 to-amber-500',
+    glowColor: 'rgba(249, 115, 22, 0.2)',
     screenshots: [
       '/projects/padel/home.png',
       '/projects/padel/league.png',
@@ -191,6 +191,22 @@ const professionalProjects: ProfessionalProject[] = [
   },
 ];
 
+const PhoneFrame = ({ children }: { children: React.ReactNode }) => (
+  <div className="relative mx-auto" style={{ width: '220px' }}>
+    {/* Phone bezel */}
+    <div className="relative rounded-[2.5rem] border-[6px] border-gray-700/80 bg-black shadow-2xl shadow-black/50 overflow-hidden">
+      {/* Notch / Dynamic Island */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-b-2xl z-20" />
+      {/* Screen content */}
+      <div className="relative aspect-[9/19.5] overflow-hidden bg-black">
+        {children}
+      </div>
+      {/* Home indicator */}
+      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-24 h-1 bg-gray-600 rounded-full z-20" />
+    </div>
+  </div>
+);
+
 const ScreenshotCarousel = ({
   screenshots,
   title,
@@ -205,27 +221,43 @@ const ScreenshotCarousel = ({
   if (screenshots.length === 0) return null;
 
   const isSingleImage = screenshots.length === 1;
-  const aspectClass =
-    aspect === 'landscape'
-      ? 'aspect-[16/10] max-h-[350px]'
-      : 'aspect-[9/16] max-h-[420px]';
+  const isLandscape = aspect === 'landscape';
+
+  if (isLandscape) {
+    return (
+      <div className="relative w-full aspect-[16/10] max-h-[350px] bg-slate-900/80 rounded-xl overflow-hidden group/carousel">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={current}
+            src={screenshots[current]}
+            alt={`${title} screenshot ${current + 1}`}
+            className="w-full h-full object-contain"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          />
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`relative w-full ${aspectClass} bg-slate-900/80 rounded-xl overflow-hidden group/carousel`}
-    >
-      <AnimatePresence mode="wait">
-        <motion.img
-          key={current}
-          src={screenshots[current]}
-          alt={`${title} screenshot ${current + 1}`}
-          className="w-full h-full object-contain"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-        />
-      </AnimatePresence>
+    <div className="relative group/carousel py-4">
+      <PhoneFrame>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={current}
+            src={screenshots[current]}
+            alt={`${title} screenshot ${current + 1}`}
+            className="w-full h-full object-cover"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          />
+        </AnimatePresence>
+      </PhoneFrame>
 
       {!isSingleImage && (
         <>
@@ -233,7 +265,7 @@ const ScreenshotCarousel = ({
             onClick={() =>
               setCurrent((p) => (p === 0 ? screenshots.length - 1 : p - 1))
             }
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/80 hover:text-white hover:bg-black/70 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
+            className="absolute left-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10"
           >
             <ChevronLeft size={18} />
           </button>
@@ -241,12 +273,12 @@ const ScreenshotCarousel = ({
             onClick={() =>
               setCurrent((p) => (p === screenshots.length - 1 ? 0 : p + 1))
             }
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 text-white/80 hover:text-white hover:bg-black/70 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer"
+            className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10"
           >
             <ChevronRight size={18} />
           </button>
 
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+          <div className="flex justify-center gap-1.5 mt-4">
             {screenshots.map((_, i) => (
               <button
                 key={i}
