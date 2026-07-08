@@ -1,6 +1,10 @@
 import { motion, type Variants } from 'framer-motion';
 import { experience } from '../../data/portfolio';
-import { getCompanyLogo, getCompanyLinkedIn } from '../../data/companyLogos';
+import {
+  getCompanyLogo,
+  getCompanyLinkedIn,
+  isLogoFullBleed,
+} from '../../data/companyLogos';
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as [number, number, number, number];
 
@@ -27,6 +31,7 @@ interface ExperienceEntryProps {
 const ExperienceEntry = ({ job }: ExperienceEntryProps) => {
   const logo = getCompanyLogo(job.company);
   const linkedIn = getCompanyLinkedIn(job.company);
+  const fullBleed = isLogoFullBleed(job.company);
 
   return (
     <motion.li
@@ -54,7 +59,9 @@ const ExperienceEntry = ({ job }: ExperienceEntryProps) => {
               width={40}
               height={40}
               loading="lazy"
-              className="h-10 w-10 shrink-0 rounded-lg border border-line bg-white object-contain p-1"
+              className={`h-10 w-10 shrink-0 rounded-lg border border-line ${
+                fullBleed ? 'object-cover' : 'bg-white object-contain p-1'
+              }`}
             />
           ) : (
             <span

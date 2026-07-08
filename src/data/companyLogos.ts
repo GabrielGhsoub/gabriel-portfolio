@@ -5,9 +5,10 @@ import inspireLogo from '../assets/images/companies/inspire.webp';
 import wonderEightLogo from '../assets/images/companies/wondereight.webp';
 import blomBankLogo from '../assets/images/companies/blom-bank.webp';
 import bbaLogo from '../assets/images/companies/bba.webp';
+import speedlaneLogo from '../assets/images/companies/speedlane.webp';
 
 export const companyLogos: Record<string, string> = {
-  Speedlane: '',
+  Speedlane: speedlaneLogo,
   'Lawyers Syndicate': bbaLogo,
   Bcom: bcomLogo,
   'GCG (Ghoussoub Consulting Group)': gcgLogo,
@@ -15,6 +16,13 @@ export const companyLogos: Record<string, string> = {
   'WonderEight Agency': wonderEightLogo,
   'Blom Bank': blomBankLogo,
 };
+
+// Logos that are full-bleed brand tiles (their own dark background) and should
+// fill the tile edge-to-edge rather than sit on a white, padded background.
+export const fullBleedLogos = new Set<string>(['Speedlane']);
+
+export const isLogoFullBleed = (companyName: string): boolean =>
+  fullBleedLogos.has(companyName);
 
 export const companyLinkedInUrls: Record<string, string> = {
   Speedlane: 'https://www.linkedin.com/company/speedlane',
