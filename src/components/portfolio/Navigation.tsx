@@ -4,6 +4,7 @@ import {
   AnimatePresence,
   useScroll,
   useMotionValueEvent,
+  useReducedMotion,
 } from 'framer-motion';
 import {
   Menu,
@@ -24,6 +25,9 @@ const navLinks = [
 ];
 
 const sectionIds = ['home', ...navLinks.map((link) => link.id)];
+
+// Height of the fixed nav bar (h-16 = 4rem = 64px)
+const NAV_OFFSET = 64;
 
 const navVariants = {
   hidden: { y: -100, opacity: 0 },
@@ -83,6 +87,7 @@ export const Navigation = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const prefersReducedMotion = useReducedMotion();
   const { scrollY, scrollYProgress } = useScroll();
 
   const updateOnScroll = useCallback((scrollTop: number) => {
@@ -131,10 +136,20 @@ export const Navigation = () => {
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (!element) return;
+
+    // Release the mobile drawer's body scroll-lock synchronously before
+    // scrolling — otherwise the scroll is a no-op while the body is locked.
     setIsMenuOpen(false);
+    document.body.style.overflow = '';
+
+    // Offset by the fixed nav height so the heading isn't hidden beneath the
+    // nav, and clamp so the last (short) section can still be reached.
+    const target = element.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: Math.max(0, target - NAV_OFFSET),
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
   };
 
   return (

@@ -47,7 +47,9 @@ body {
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-ink);
-  overflow-x: hidden;
+  /* clip (not hidden) prevents body from becoming a scroll container,
+     which would break window/scrollIntoView scrolling */
+  overflow-x: clip;
 }
 
 /* Smooth anchor scrolling only for users who allow motion */

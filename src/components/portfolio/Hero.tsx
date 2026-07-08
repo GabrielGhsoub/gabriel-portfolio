@@ -25,9 +25,10 @@ const itemVariants = {
 
 export const Hero = () => {
   const scrollToAbout = () => {
-    document
-      .getElementById('about')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const about = document.getElementById('about');
+    if (!about) return;
+    const target = about.getBoundingClientRect().top + window.scrollY - 64;
+    window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
   };
 
   return (
