@@ -7,6 +7,7 @@ import {
   Experience,
   Contact,
 } from '../components/portfolio';
+import { personalInfo } from '../data/portfolio';
 
 export const Portfolio = () => {
   return (
@@ -38,6 +39,12 @@ export const Portfolio = () => {
           <Contact />
         </section>
       </main>
+
+      <footer className="border-t border-line py-8">
+        <div className="container max-w-5xl mx-auto px-6 text-center font-mono text-xs text-ink-muted">
+          Designed &amp; built by {personalInfo.name} &middot; 2026
+        </div>
+      </footer>
     </div>
   );
 };
