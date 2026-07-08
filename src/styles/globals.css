@@ -116,23 +116,3 @@ body {
   mask-image: linear-gradient(to bottom, black 20%, transparent 90%);
   -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 90%);
 }
-
-/* ============================================
-   Motion — CSS animations are opt-in only
-   ============================================ */
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes caret-blink {
-    0%,
-    45% {
-      opacity: 1;
-    }
-    55%,
-    100% {
-      opacity: 0;
-    }
-  }
-
-  .animate-caret {
-    animation: caret-blink 1.1s steps(1) infinite;
-  }
-}
