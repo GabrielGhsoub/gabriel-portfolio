@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from 'framer-motion';
 import {
   Menu,
   X,
-  Home,
   User,
   Briefcase,
   Award,
@@ -11,51 +15,99 @@ import {
   FolderKanban,
 } from 'lucide-react';
 
-const navItems = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'about', label: 'About', icon: User },
-  { id: 'projects', label: 'Projects', icon: FolderKanban },
-  { id: 'skills', label: 'Skills', icon: Award },
-  { id: 'experience', label: 'Experience', icon: Briefcase },
-  { id: 'contact', label: 'Contact', icon: MessageCircle },
+const navLinks = [
+  { id: 'about', number: '01', label: 'About', icon: User },
+  { id: 'projects', number: '02', label: 'Projects', icon: FolderKanban },
+  { id: 'skills', number: '03', label: 'Skills', icon: Award },
+  { id: 'experience', number: '04', label: 'Experience', icon: Briefcase },
+  { id: 'contact', number: '05', label: 'Contact', icon: MessageCircle },
 ];
+
+const sectionIds = ['home', ...navLinks.map((link) => link.id)];
+
+const navVariants = {
+  hidden: { y: -100, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 20,
+      delay: 0.1,
+    },
+  },
+};
+
+const drawerVariants = {
+  closed: {
+    x: '100%',
+    transition: {
+      type: 'spring' as const,
+      stiffness: 300,
+      damping: 30,
+    },
+  },
+  open: {
+    x: 0,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 200,
+      damping: 25,
+      staggerChildren: 0.07,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const drawerItemVariants = {
+  closed: { x: 50, opacity: 0 },
+  open: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 200,
+      damping: 20,
+    },
+  },
+};
+
+const backdropVariants = {
+  closed: { opacity: 0 },
+  open: { opacity: 1 },
+};
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
 
-  const handleScroll = useCallback(() => {
-    const scrollTop = window.scrollY;
+  const { scrollY, scrollYProgress } = useScroll();
+
+  const updateOnScroll = useCallback((scrollTop: number) => {
+    // React bails out when the value is unchanged, so state only
+    // flips when crossing the 50px threshold.
     setIsScrolled(scrollTop > 50);
 
-    // Calculate scroll progress
-    const docHeight =
-      document.documentElement.scrollHeight - window.innerHeight;
-    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    setScrollProgress(Math.min(progress, 100));
-
-    // Update active section based on scroll position (bottom-up check)
-    const sections = navItems.map((item) => item.id);
-    for (let i = sections.length - 1; i >= 0; i--) {
-      const element = document.getElementById(sections[i]);
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        if (rect.top <= 120) {
-          setActiveSection(sections[i]);
-          break;
-        }
+    // Active section: bottom-up check of section positions
+    for (let i = sectionIds.length - 1; i >= 0; i--) {
+      const element = document.getElementById(sectionIds[i]);
+      if (element && element.getBoundingClientRect().top <= 120) {
+        setActiveSection(sectionIds[i]);
+        break;
       }
     }
   }, []);
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+  useMotionValueEvent(scrollY, 'change', updateOnScroll);
 
-  // Lock body scroll when mobile menu is open
+  // Sync state on mount (e.g. page loaded mid-scroll)
+  useEffect(() => {
+    updateOnScroll(window.scrollY);
+  }, [updateOnScroll]);
+
+  // Lock body scroll while the mobile drawer is open
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -67,170 +119,111 @@ export const Navigation = () => {
     };
   }, [isMenuOpen]);
 
+  // Close the drawer on Escape
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isMenuOpen]);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     setIsMenuOpen(false);
   };
 
-  const navVariants = {
-    hidden: { y: -100, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 100,
-        damping: 20,
-        delay: 0.1,
-      },
-    },
-  };
-
-  const mobileMenuVariants = {
-    closed: {
-      x: '100%',
-      transition: {
-        type: 'spring' as const,
-        stiffness: 300,
-        damping: 30,
-      },
-    },
-    open: {
-      x: 0,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 200,
-        damping: 25,
-        staggerChildren: 0.07,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const mobileItemVariants = {
-    closed: { x: 50, opacity: 0 },
-    open: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring' as const,
-        stiffness: 200,
-        damping: 20,
-      },
-    },
-  };
-
-  const backdropVariants = {
-    closed: { opacity: 0 },
-    open: { opacity: 1 },
-  };
-
   return (
     <>
-      {/* Scroll Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]">
-        <div
-          className="h-full scroll-progress-bar"
-          style={{ width: `${scrollProgress}%` }}
-        />
-      </div>
+      {/* Scroll progress bar */}
+      <motion.div
+        aria-hidden="true"
+        style={{ scaleX: scrollYProgress }}
+        className="fixed top-0 left-0 right-0 h-0.5 bg-accent origin-left z-[60]"
+      />
 
       <motion.nav
         variants={navVariants}
         initial="hidden"
         animate="visible"
-        className={`fixed top-[2px] left-0 right-0 z-50 transition-all duration-500 ${
+        aria-label="Primary"
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
           isScrolled
-            ? 'glass-strong shadow-lg shadow-black/10'
-            : 'bg-transparent'
+            ? 'bg-background/80 backdrop-blur-md border-b border-line'
+            : 'bg-transparent border-b border-transparent'
         }`}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <motion.button
-              className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               onClick={() => scrollToSection('home')}
+              className="font-display font-bold text-xl text-ink cursor-pointer"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
               aria-label="Go to top"
             >
-              GG
+              GG<span className="text-accent">.</span>
             </motion.button>
 
-            {/* Desktop Navigation */}
+            {/* Desktop navigation */}
             <div className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => {
-                const IconComponent = item.icon;
+              {navLinks.map((item) => {
                 const isActive = activeSection === item.id;
-
                 return (
                   <motion.button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer nav-link-underline ${
+                    className={`font-mono text-sm px-3 py-2 transition-colors cursor-pointer ${
                       isActive
-                        ? 'text-blue-400 active'
-                        : 'text-gray-400 hover:text-gray-200'
+                        ? 'text-accent'
+                        : 'text-ink-secondary hover:text-accent'
                     }`}
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    {/* Active background indicator with layout animation */}
-                    {isActive && (
-                      <motion.div
-                        className="absolute inset-0 rounded-lg bg-blue-500/[0.08] border border-blue-500/20"
-                        layoutId="activeNavBg"
-                        transition={{
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                      />
-                    )}
-                    <IconComponent size={16} className="relative z-10" />
-                    <span className="font-medium text-sm relative z-10">
-                      {item.label}
-                    </span>
+                    <span className="text-accent">{item.number}.</span>{' '}
+                    {item.label}
                   </motion.button>
                 );
               })}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile menu button */}
             <motion.button
-              className="md:hidden relative p-2 text-gray-300 hover:text-white rounded-lg hover:bg-white/[0.05] transition-colors cursor-pointer"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-lg text-ink-secondary hover:text-accent transition-colors cursor-pointer"
               whileTap={{ scale: 0.9 }}
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
             >
               <AnimatePresence mode="wait" initial={false}>
                 {isMenuOpen ? (
-                  <motion.div
+                  <motion.span
                     key="close"
+                    className="block"
                     initial={{ rotate: -90, opacity: 0 }}
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <X size={24} />
-                  </motion.div>
+                    <X size={24} aria-hidden="true" />
+                  </motion.span>
                 ) : (
-                  <motion.div
+                  <motion.span
                     key="menu"
+                    className="block"
                     initial={{ rotate: 90, opacity: 0 }}
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <Menu size={24} />
-                  </motion.div>
+                    <Menu size={24} aria-hidden="true" />
+                  </motion.span>
                 )}
               </AnimatePresence>
             </motion.button>
@@ -238,7 +231,7 @@ export const Navigation = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -249,68 +242,72 @@ export const Navigation = () => {
               animate="open"
               exit="closed"
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-background/70 md:hidden"
               onClick={() => setIsMenuOpen(false)}
+              aria-hidden="true"
             />
 
-            {/* Slide-in Menu Panel */}
+            {/* Slide-in panel */}
             <motion.div
-              variants={mobileMenuVariants}
+              variants={drawerVariants}
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-0 right-0 bottom-0 z-50 w-[280px] bg-slate-900/95 backdrop-blur-xl border-l border-white/[0.08] md:hidden flex flex-col"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
+              className="fixed top-0 right-0 bottom-0 z-50 w-[280px] bg-surface border-l border-line md:hidden flex flex-col"
             >
-              {/* Menu Header */}
-              <div className="flex items-center justify-between px-6 h-16 border-b border-white/[0.06]">
-                <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Menu
-                </span>
+              {/* Drawer header */}
+              <div className="flex h-16 items-center justify-between border-b border-line px-6">
+                <button
+                  onClick={() => scrollToSection('home')}
+                  className="font-display font-bold text-xl text-ink cursor-pointer"
+                  aria-label="Go to top"
+                >
+                  GG<span className="text-accent">.</span>
+                </button>
                 <motion.button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/[0.05] transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-ink-secondary hover:text-accent transition-colors cursor-pointer"
                   whileTap={{ scale: 0.9 }}
                   aria-label="Close menu"
                 >
-                  <X size={20} />
+                  <X size={20} aria-hidden="true" />
                 </motion.button>
               </div>
 
-              {/* Menu Items */}
-              <div className="flex-1 flex flex-col justify-center px-6 gap-2">
-                {navItems.map((item) => {
+              {/* Drawer items */}
+              <div className="flex flex-1 flex-col justify-center gap-2 px-6">
+                {navLinks.map((item) => {
                   const IconComponent = item.icon;
                   const isActive = activeSection === item.id;
-
                   return (
                     <motion.button
                       key={item.id}
-                      variants={mobileItemVariants}
+                      variants={drawerItemVariants}
                       onClick={() => scrollToSection(item.id)}
-                      className={`flex items-center gap-4 px-5 py-4 rounded-xl text-lg transition-all duration-300 cursor-pointer ${
+                      className={`flex items-center gap-4 rounded-lg px-4 py-3 transition-colors cursor-pointer ${
                         isActive
-                          ? 'bg-blue-500/[0.1] text-blue-400 border border-blue-500/20'
-                          : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.04]'
+                          ? 'text-accent bg-elevated'
+                          : 'text-ink-secondary hover:text-accent hover:bg-elevated'
                       }`}
                       whileHover={{ x: 4 }}
                       whileTap={{ scale: 0.97 }}
                     >
-                      <IconComponent size={20} />
-                      <span className="font-medium">{item.label}</span>
-                      {isActive && (
-                        <motion.div
-                          className="ml-auto w-2 h-2 rounded-full bg-blue-400"
-                          layoutId="activeMobileIndicator"
-                        />
-                      )}
+                      <IconComponent size={18} aria-hidden="true" />
+                      <span className="font-mono text-sm">
+                        <span className="text-accent">{item.number}.</span>{' '}
+                        {item.label}
+                      </span>
                     </motion.button>
                   );
                 })}
               </div>
 
-              {/* Menu Footer */}
-              <div className="px-6 py-6 border-t border-white/[0.06]">
-                <p className="text-xs text-gray-600 text-center">
+              {/* Drawer footer */}
+              <div className="border-t border-line px-6 py-6">
+                <p className="text-center font-mono text-xs text-ink-muted">
                   Gabriel Ghoussoub
                 </p>
               </div>
