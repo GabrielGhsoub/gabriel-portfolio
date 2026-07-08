@@ -70,10 +70,10 @@ const personalProjects: PersonalProject[] = [
     gradient: 'from-orange-500 to-amber-500',
     glowColor: 'rgba(249, 115, 22, 0.2)',
     screenshots: [
-      '/projects/padel/home.png',
-      '/projects/padel/league.png',
-      '/projects/padel/play.png',
-      '/projects/padel/profile.png',
+      '/projects/padel/home.webp',
+      '/projects/padel/league.webp',
+      '/projects/padel/play.webp',
+      '/projects/padel/profile.webp',
     ],
     link: 'https://apps.apple.com/lb/app/padel-lebanon/id6759597948',
     linkLabel: 'View on App Store',
@@ -101,10 +101,10 @@ const personalProjects: PersonalProject[] = [
     gradient: 'from-indigo-500 to-violet-500',
     glowColor: 'rgba(99, 102, 241, 0.2)',
     screenshots: [
-      '/projects/fitness/program.png',
-      '/projects/fitness/workout.png',
-      '/projects/fitness/coach.png',
-      '/projects/fitness/summary.png',
+      '/projects/fitness/program.webp',
+      '/projects/fitness/workout.webp',
+      '/projects/fitness/coach.webp',
+      '/projects/fitness/summary.webp',
     ],
   },
   {
@@ -128,7 +128,7 @@ const personalProjects: PersonalProject[] = [
     icon: Headset,
     gradient: 'from-rose-500 to-pink-500',
     glowColor: 'rgba(244, 63, 94, 0.2)',
-    screenshots: ['/projects/salsa/quest3.jpg'],
+    screenshots: ['/projects/salsa/quest3.webp'],
     screenshotAspect: 'landscape',
   },
 ];

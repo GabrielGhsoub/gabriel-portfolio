@@ -1,10 +1,10 @@
 // Import company logos
 import bcomLogo from '../assets/images/companies/intelsat.svg';
-import gcgLogo from '../assets/images/companies/GCG.png';
-import inspireLogo from '../assets/images/companies/inspire_innovations_logo.jpg';
-import wonderEightLogo from '../assets/images/companies/WonderEight.jpg';
-import blomBankLogo from '../assets/images/companies/Blom-bank.jpg';
-import bbaLogo from '../assets/images/companies/BBA icon.png';
+import gcgLogo from '../assets/images/companies/gcg.webp';
+import inspireLogo from '../assets/images/companies/inspire.webp';
+import wonderEightLogo from '../assets/images/companies/wondereight.webp';
+import blomBankLogo from '../assets/images/companies/blom-bank.webp';
+import bbaLogo from '../assets/images/companies/bba.webp';
 
 export const companyLogos: Record<string, string> = {
   Speedlane: '',

@@ -11,7 +11,7 @@ import {
   Mouse,
 } from 'lucide-react';
 import { personalInfo } from '../../data/portfolio';
-import profileImage from '../../assets/images/profile/profile.jpeg';
+import profileImage from '../../assets/images/profile/profile.webp';
 
 const FloatingParticle = ({
   delay,
