@@ -1,16 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import {
-  Layers,
   Satellite,
   Scale,
   Fingerprint,
   Cpu,
   CloudCog,
-  Code2,
   ExternalLink,
-  Sparkles,
   Smartphone,
   Dumbbell,
   Headset,
@@ -20,14 +16,14 @@ import {
   Briefcase,
 } from 'lucide-react';
 
+const EASE = [0.21, 0.47, 0.32, 0.98] as [number, number, number, number];
+
 interface PersonalProject {
   title: string;
   description: string;
   tech: string[];
   highlights: string[];
   icon: typeof Smartphone;
-  gradient: string;
-  glowColor: string;
   screenshots: string[];
   screenshotAspect?: 'portrait' | 'landscape';
   link?: string;
@@ -40,9 +36,6 @@ interface ProfessionalProject {
   tech: string[];
   category: string;
   icon: typeof Satellite;
-  gradient: string;
-  accentColor: string;
-  glowColor: string;
 }
 
 const personalProjects: PersonalProject[] = [
@@ -67,8 +60,6 @@ const personalProjects: PersonalProject[] = [
       'Admin panel with React + shadcn/ui',
     ],
     icon: Smartphone,
-    gradient: 'from-orange-500 to-amber-500',
-    glowColor: 'rgba(249, 115, 22, 0.2)',
     screenshots: [
       '/projects/padel/home.webp',
       '/projects/padel/league.webp',
@@ -98,8 +89,6 @@ const personalProjects: PersonalProject[] = [
       'Full offline SQLite database with FTS5 search',
     ],
     icon: Dumbbell,
-    gradient: 'from-indigo-500 to-violet-500',
-    glowColor: 'rgba(99, 102, 241, 0.2)',
     screenshots: [
       '/projects/fitness/program.webp',
       '/projects/fitness/workout.webp',
@@ -126,8 +115,6 @@ const personalProjects: PersonalProject[] = [
       'Haptic feedback on every salsa beat',
     ],
     icon: Headset,
-    gradient: 'from-rose-500 to-pink-500',
-    glowColor: 'rgba(244, 63, 94, 0.2)',
     screenshots: ['/projects/salsa/quest3.webp'],
     screenshotAspect: 'landscape',
   },
@@ -141,9 +128,6 @@ const professionalProjects: ProfessionalProject[] = [
     tech: ['Java WebFlux', 'React', 'MongoDB', 'PostgreSQL'],
     category: 'Enterprise Platform',
     icon: Satellite,
-    gradient: 'from-blue-500 to-cyan-500',
-    accentColor: 'blue',
-    glowColor: 'rgba(59, 130, 246, 0.15)',
   },
   {
     title: 'eBareau Legal Platform',
@@ -152,9 +136,6 @@ const professionalProjects: ProfessionalProject[] = [
     tech: ['Java', 'React', 'Jenkins CI/CD', 'PostgreSQL'],
     category: 'Web Platform',
     icon: Scale,
-    gradient: 'from-purple-500 to-violet-500',
-    accentColor: 'purple',
-    glowColor: 'rgba(139, 92, 246, 0.15)',
   },
   {
     title: 'National Digital Identity System',
@@ -163,9 +144,6 @@ const professionalProjects: ProfessionalProject[] = [
     tech: ['Java', 'React', 'Security', 'Architecture'],
     category: 'Identity & Security',
     icon: Fingerprint,
-    gradient: 'from-emerald-500 to-teal-500',
-    accentColor: 'emerald',
-    glowColor: 'rgba(16, 185, 129, 0.15)',
   },
   {
     title: 'IoT Energy Management System',
@@ -174,9 +152,6 @@ const professionalProjects: ProfessionalProject[] = [
     tech: ['Angular', 'IoT', 'Analytics', 'Real-time'],
     category: 'IoT & Analytics',
     icon: Cpu,
-    gradient: 'from-orange-500 to-amber-500',
-    accentColor: 'orange',
-    glowColor: 'rgba(249, 115, 22, 0.15)',
   },
   {
     title: 'Healthcare BPM Migration',
@@ -185,25 +160,48 @@ const professionalProjects: ProfessionalProject[] = [
     tech: ['Spring WebFlux', 'Kubernetes', 'JUnit', 'Azure DevOps'],
     category: 'Cloud Migration',
     icon: CloudCog,
-    gradient: 'from-pink-500 to-rose-500',
-    accentColor: 'pink',
-    glowColor: 'rgba(236, 72, 153, 0.15)',
   },
 ];
 
-const PhoneFrame = ({ children }: { children: React.ReactNode }) => (
+const listVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: EASE },
+  },
+};
+
+const TechChip = ({ label }: { label: string }) => (
+  <span className="font-mono text-xs px-3 py-1 rounded-full border border-line bg-surface text-ink-secondary hover:text-accent hover:border-accent/40 transition-colors">
+    {label}
+  </span>
+);
+
+const PhoneFrame = ({ children }: { children: ReactNode }) => (
   <div className="relative mx-auto w-[180px] sm:w-[220px]">
-    <div className="relative rounded-[2rem] sm:rounded-[2.5rem] border-[5px] sm:border-[6px] border-gray-700/80 bg-black shadow-2xl shadow-black/50 overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 sm:w-20 h-4 sm:h-5 bg-black rounded-b-xl sm:rounded-b-2xl z-20" />
-      <div className="relative aspect-[9/19.5] overflow-hidden bg-black">
+    <div className="relative overflow-hidden rounded-[2rem] border-4 border-line-bright bg-elevated sm:rounded-[2.5rem] sm:border-[5px]">
+      <div className="absolute top-0 left-1/2 z-20 h-4 w-16 -translate-x-1/2 rounded-b-xl bg-elevated sm:h-5 sm:w-20 sm:rounded-b-2xl" />
+      <div className="relative aspect-[9/19.5] overflow-hidden bg-background">
         {children}
       </div>
-      <div className="absolute bottom-1 sm:bottom-1.5 left-1/2 -translate-x-1/2 w-20 sm:w-24 h-1 bg-gray-600 rounded-full z-20" />
+      <div className="absolute bottom-1 left-1/2 z-20 h-1 w-20 -translate-x-1/2 rounded-full bg-line-bright sm:bottom-1.5 sm:w-24" />
     </div>
   </div>
 );
 
 const SWIPE_THRESHOLD = 50;
+
+const slideVariants = {
+  enter: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0 }),
+};
 
 const ScreenshotCarousel = ({
   screenshots,
@@ -242,17 +240,10 @@ const ScreenshotCarousel = ({
   if (screenshots.length === 0) return null;
 
   const isSingleImage = screenshots.length === 1;
-  const isLandscape = aspect === 'landscape';
 
-  const slideVariants = {
-    enter: (d: number) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (d: number) => ({ x: d > 0 ? -80 : 80, opacity: 0 }),
-  };
-
-  if (isLandscape) {
+  if (aspect === 'landscape') {
     return (
-      <div className="relative w-full aspect-[16/10] max-h-[350px] bg-slate-900/80 rounded-xl overflow-hidden">
+      <div className="relative w-full aspect-[16/10] max-h-[350px] overflow-hidden rounded-lg border border-line bg-elevated">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.img
             key={current}
@@ -262,9 +253,12 @@ const ScreenshotCarousel = ({
             animate="center"
             exit="exit"
             src={screenshots[current]}
-            alt={`${title} screenshot ${current + 1}`}
-            className="w-full h-full object-contain"
-            transition={{ duration: 0.3 }}
+            alt={`${title} screenshot ${current + 1} of ${screenshots.length}`}
+            width={720}
+            height={480}
+            loading="lazy"
+            className="h-full w-full object-contain"
+            transition={{ duration: 0.3, ease: EASE }}
           />
         </AnimatePresence>
       </div>
@@ -272,7 +266,7 @@ const ScreenshotCarousel = ({
   }
 
   return (
-    <div className="relative group/carousel py-2 sm:py-4 touch-pan-y">
+    <div className="group/carousel relative touch-pan-y py-2 sm:py-4">
       <PhoneFrame>
         <AnimatePresence mode="wait" custom={direction}>
           <motion.img
@@ -287,10 +281,14 @@ const ScreenshotCarousel = ({
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
             src={screenshots[current]}
-            alt={`${title} screenshot ${current + 1}`}
-            className="w-full h-full object-cover select-none"
+            alt={`${title} screenshot ${current + 1} of ${screenshots.length}`}
+            width={390}
+            height={845}
+            loading="lazy"
+            draggable={false}
+            className="h-full w-full select-none object-cover"
             style={{ touchAction: 'pan-y' }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.3, ease: EASE }}
           />
         </AnimatePresence>
       </PhoneFrame>
@@ -298,30 +296,37 @@ const ScreenshotCarousel = ({
       {!isSingleImage && (
         <>
           <button
+            type="button"
             onClick={() => paginate(-1)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10 hidden sm:block"
+            aria-label={`Previous ${title} screenshot`}
+            className="absolute left-0 top-1/2 z-10 hidden -translate-y-1/2 cursor-pointer rounded-full border border-line bg-elevated p-1.5 text-ink-secondary opacity-0 transition-[opacity,color,border-color] duration-300 hover:border-accent/50 hover:text-accent focus-visible:opacity-100 group-hover/carousel:opacity-100 sm:block"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={18} aria-hidden="true" />
           </button>
           <button
+            type="button"
             onClick={() => paginate(1)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/60 text-white/80 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100 cursor-pointer z-10 hidden sm:block"
+            aria-label={`Next ${title} screenshot`}
+            className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 cursor-pointer rounded-full border border-line bg-elevated p-1.5 text-ink-secondary opacity-0 transition-[opacity,color,border-color] duration-300 hover:border-accent/50 hover:text-accent focus-visible:opacity-100 group-hover/carousel:opacity-100 sm:block"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={18} aria-hidden="true" />
           </button>
 
-          <div className="flex justify-center gap-2 mt-3 sm:mt-4">
+          <div className="mt-3 flex justify-center gap-2 sm:mt-4">
             {screenshots.map((_, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => {
                   setDirection(i > current ? 1 : -1);
                   setCurrent(i);
                 }}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
+                aria-label={`Go to ${title} screenshot ${i + 1}`}
+                aria-current={i === current}
+                className={`h-1.5 cursor-pointer rounded-full transition-colors ${
                   i === current
-                    ? 'bg-white w-6'
-                    : 'bg-white/40 hover:bg-white/60 w-2'
+                    ? 'w-6 bg-accent'
+                    : 'w-1.5 bg-line hover:bg-line-bright'
                 }`}
               />
             ))}
@@ -332,45 +337,15 @@ const ScreenshotCarousel = ({
   );
 };
 
-const PersonalProjectCard = ({
-  project,
-  index,
-}: {
-  project: PersonalProject;
-  index: number;
-}) => {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
+const PersonalProjectCard = ({ project }: { project: PersonalProject }) => {
   const IconComponent = project.icon;
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 60 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 60 }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.2,
-        type: 'spring' as const,
-        stiffness: 80,
-        damping: 15,
-      }}
-      className="group relative"
-    >
-      <div
-        className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-xl"
-        style={{
-          background: `radial-gradient(ellipse at center, ${project.glowColor}, transparent 70%)`,
-        }}
-      />
-
-      <div className="relative bg-slate-800/60 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-gray-700/40 group-hover:border-gray-500/40 transition-all duration-500 overflow-hidden">
-        <div
-          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${project.gradient}`}
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+    <motion.div variants={itemVariants}>
+      <article className="overflow-hidden rounded-xl border border-line bg-surface transition-[transform,border-color,background-color] duration-300 hover:-translate-y-1 hover:border-line-bright">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Screenshot Carousel */}
-          <div className="p-4 sm:p-6 flex items-center justify-center bg-slate-900/30">
+          <div className="flex items-center justify-center border-b border-line bg-background/60 p-4 sm:p-6 lg:border-b-0 lg:border-r">
             <ScreenshotCarousel
               screenshots={project.screenshots}
               title={project.title}
@@ -379,256 +354,172 @@ const PersonalProjectCard = ({
           </div>
 
           {/* Content */}
-          <div className="p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
-            <div className="flex items-center gap-3 mb-3 sm:mb-4">
-              <motion.div
-                className={`p-2 sm:p-2.5 rounded-xl bg-gradient-to-br ${project.gradient} shadow-lg`}
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: 'spring' as const, stiffness: 300 }}
-              >
-                <IconComponent
-                  size={20}
-                  className="text-white sm:w-[22px] sm:h-[22px]"
-                />
-              </motion.div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white">
+          <div className="flex flex-col justify-center p-6 sm:p-8">
+            <div className="mb-4 flex items-center gap-3">
+              <IconComponent
+                size={20}
+                className="shrink-0 text-accent"
+                aria-hidden="true"
+              />
+              <h3 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
                 {project.title}
               </h3>
             </div>
 
-            <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-5">
+            <p className="mb-5 text-sm leading-relaxed text-ink-secondary">
               {project.description}
             </p>
 
             {/* Highlights */}
-            <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5">
-              {project.highlights.map((highlight, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={
-                    inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }
-                  }
-                  transition={{ delay: index * 0.2 + i * 0.1 + 0.3 }}
-                  className="flex items-start gap-2 text-xs sm:text-sm"
+            <ul className="mb-6 space-y-2">
+              {project.highlights.map((highlight) => (
+                <li
+                  key={highlight}
+                  className="flex items-start gap-3 text-sm text-ink-secondary"
                 >
                   <span
-                    className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-gradient-to-r ${project.gradient} flex-shrink-0`}
+                    aria-hidden="true"
+                    className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent"
                   />
-                  <span className="text-gray-300">{highlight}</span>
-                </motion.div>
+                  {highlight}
+                </li>
               ))}
-            </div>
+            </ul>
 
             {/* Tech Stack */}
-            <div className="mb-4 sm:mb-5">
-              <div className="flex items-center gap-2 mb-2">
-                <Code2 size={13} className="text-gray-500" />
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tech Stack
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {project.tech.map((tech, i) => (
-                  <motion.span
-                    key={tech}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={
-                      inView
-                        ? { opacity: 1, scale: 1 }
-                        : { opacity: 0, scale: 0.8 }
-                    }
-                    transition={{
-                      delay: index * 0.2 + i * 0.06 + 0.4,
-                      type: 'spring' as const,
-                      stiffness: 200,
-                    }}
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700/40 text-gray-300 text-[11px] sm:text-xs font-medium rounded-lg border border-gray-600/30 hover:border-gray-500/50 hover:bg-gray-700/60 transition-all duration-200"
-                    whileHover={{ scale: 1.05, y: -1 }}
-                  >
-                    {tech}
-                  </motion.span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map((tech) => (
+                <TechChip key={tech} label={tech} />
+              ))}
             </div>
 
             {/* Link */}
             {project.link && (
-              <motion.a
+              <a
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r ${project.gradient} text-white text-sm font-medium w-fit hover:shadow-lg transition-shadow duration-300`}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                aria-label={`${project.linkLabel ?? 'View project'}: ${project.title} (opens in new tab)`}
+                className="mt-6 inline-flex w-fit items-center gap-2 font-mono text-sm text-ink-secondary transition-colors hover:text-accent"
               >
-                <ExternalLink size={14} />
-                {project.linkLabel || 'View Project'}
-              </motion.a>
+                <ExternalLink size={15} aria-hidden="true" />
+                {project.linkLabel ?? 'View Project'}
+              </a>
             )}
           </div>
         </div>
-      </div>
+      </article>
     </motion.div>
   );
 };
 
 const ProfessionalProjectCard = ({
   project,
-  index,
 }: {
   project: ProfessionalProject;
-  index: number;
 }) => {
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const IconComponent = project.icon;
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-      animate={
-        inView
-          ? { opacity: 1, y: 0, scale: 1 }
-          : { opacity: 0, y: 40, scale: 0.95 }
-      }
-      transition={{
-        duration: 0.5,
-        delay: index * 0.1,
-        type: 'spring' as const,
-        stiffness: 100,
-        damping: 15,
-      }}
-      className="group relative"
-    >
-      <div
-        className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"
-        style={{
-          background: `linear-gradient(135deg, ${project.glowColor}, transparent, ${project.glowColor})`,
-        }}
-      />
-
-      <div className="relative bg-slate-800/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 group-hover:border-gray-500/50 transition-all duration-500 overflow-hidden h-full flex flex-col p-4 sm:p-6">
-        <div
-          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${project.gradient}`}
-        />
-
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
-          <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-semibold rounded-full bg-white/5 text-white/80 border border-white/10">
-            <Layers size={12} />
+    <motion.div variants={itemVariants} className="h-full">
+      <article className="flex h-full flex-col rounded-xl border border-line bg-surface p-6 transition-[transform,border-color,background-color] duration-300 hover:-translate-y-1 hover:border-line-bright">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <span className="font-mono text-xs uppercase tracking-wider text-ink-muted">
             {project.category}
           </span>
-          <motion.div
-            className={`p-2 rounded-xl bg-gradient-to-br ${project.gradient} shadow-lg`}
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            transition={{ type: 'spring' as const, stiffness: 300 }}
-          >
-            <IconComponent size={18} className="text-white" />
-          </motion.div>
+          <IconComponent
+            size={18}
+            className="shrink-0 text-accent"
+            aria-hidden="true"
+          />
         </div>
 
-        <h3 className="text-base sm:text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-cyan-400 transition-all duration-300">
+        <h3 className="mb-2 font-display text-lg font-semibold tracking-tight text-ink">
           {project.title}
         </h3>
 
-        <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 flex-1">
+        <p className="mb-5 flex-1 text-sm leading-relaxed text-ink-secondary">
           {project.description}
         </p>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {project.tech.map((tech) => (
-            <span
-              key={tech}
-              className="px-2 sm:px-2.5 py-1 bg-gray-700/40 text-gray-400 text-[11px] sm:text-xs font-medium rounded-md border border-gray-600/30"
-            >
-              {tech}
-            </span>
+            <TechChip key={tech} label={tech} />
           ))}
         </div>
-      </div>
+      </article>
     </motion.div>
   );
 };
 
 export const Projects = () => {
-  const [titleRef, titleInView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
-  const [proRef, proInView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
   const [activeTab, setActiveTab] = useState<'personal' | 'professional'>(
     'professional'
   );
 
+  const tabs = [
+    {
+      id: 'professional' as const,
+      label: 'Professional Work',
+      icon: Briefcase,
+    },
+    { id: 'personal' as const, label: 'Personal Apps', icon: AppWindow },
+  ];
+
   return (
-    <section className="py-12 sm:py-20 bg-gradient-to-b from-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 right-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 right-10 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-grid-pattern" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
+    <div className="py-24 md:py-32">
+      <div className="container max-w-5xl mx-auto px-6">
         {/* Section Header */}
         <motion.div
-          ref={titleRef}
-          initial={{ opacity: 0, y: -30 }}
-          animate={titleInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -30 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-8 sm:mb-12"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: EASE }}
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="text-cyan-500" size={28} />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
-              Featured Projects
+          <div className="mb-12 flex items-center gap-4">
+            <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-ink">
+              <span className="font-mono text-lg md:text-xl text-accent mr-3 align-middle">
+                02.
+              </span>
+              Projects
             </h2>
+            <div aria-hidden="true" className="h-px flex-1 bg-line" />
           </div>
-          <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
-            From published mobile apps to enterprise platforms, projects I've
-            built end-to-end
-          </p>
-        </motion.div>
 
-        {/* Tab Toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={titleInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 0.3 }}
-          className="flex justify-center mb-8 sm:mb-12"
-        >
-          <div className="inline-flex rounded-2xl bg-slate-800/70 border border-gray-700/50 p-1 sm:p-1.5">
-            <button
-              onClick={() => setActiveTab('professional')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer ${
-                activeTab === 'professional'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <Briefcase size={14} className="sm:w-4 sm:h-4" />
-              Professional Work
-            </button>
-            <button
-              onClick={() => setActiveTab('personal')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer ${
-                activeTab === 'personal'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <AppWindow size={14} className="sm:w-4 sm:h-4" />
-              Personal Apps
-            </button>
+          <p className="mb-10 max-w-2xl leading-relaxed text-ink-secondary">
+            From published mobile apps to enterprise platforms, projects I've
+            built end-to-end.
+          </p>
+
+          {/* Tabs */}
+          <div
+            role="tablist"
+            aria-label="Project categories"
+            className="mb-12 flex gap-8 border-b border-line"
+          >
+            {tabs.map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  id={`tab-${tab.id}`}
+                  aria-selected={isActive}
+                  aria-controls={`panel-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`-mb-px flex cursor-pointer items-center gap-2 border-b-2 pb-3 font-mono text-sm transition-colors ${
+                    isActive
+                      ? 'border-accent text-accent'
+                      : 'border-transparent text-ink-secondary hover:text-ink'
+                  }`}
+                >
+                  <TabIcon size={14} aria-hidden="true" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -637,55 +528,56 @@ export const Projects = () => {
           {activeTab === 'personal' ? (
             <motion.div
               key="personal"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-6 sm:space-y-8 max-w-6xl mx-auto"
+              role="tabpanel"
+              id="panel-personal"
+              aria-labelledby="tab-personal"
+              variants={listVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-80px' }}
+              exit={{ opacity: 0, y: -12, transition: { duration: 0.2 } }}
+              className="space-y-8"
             >
-              {personalProjects.map((project, index) => (
-                <PersonalProjectCard
-                  key={project.title}
-                  project={project}
-                  index={index}
-                />
+              {personalProjects.map((project) => (
+                <PersonalProjectCard key={project.title} project={project} />
               ))}
             </motion.div>
           ) : (
             <motion.div
               key="professional"
-              ref={proRef}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 max-w-7xl mx-auto"
+              role="tabpanel"
+              id="panel-professional"
+              aria-labelledby="tab-professional"
+              variants={listVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-80px' }}
+              exit={{ opacity: 0, y: -12, transition: { duration: 0.2 } }}
+              className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
             >
-              {professionalProjects.map((project, index) => (
+              {professionalProjects.map((project) => (
                 <ProfessionalProjectCard
                   key={project.title}
                   project={project}
-                  index={index}
                 />
               ))}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Bottom accent */}
+        {/* Bottom note */}
         <motion.div
-          ref={proRef}
-          className="mt-10 sm:mt-16 text-center"
-          initial={{ opacity: 0 }}
-          animate={proInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="mt-16 text-center"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-gray-700/50 text-gray-500 text-sm">
-            <Code2 size={14} />
-            <span>Always building something new</span>
-          </div>
+          <span className="inline-flex items-center rounded-full border border-line px-4 py-2 font-mono text-xs text-ink-muted">
+            Always building something new
+          </span>
         </motion.div>
       </div>
-    </section>
+    </div>
   );
 };
