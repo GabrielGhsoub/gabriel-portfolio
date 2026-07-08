@@ -47,7 +47,7 @@ const ExperienceEntry = ({ job }: ExperienceEntryProps) => {
       {/* Entry body */}
       <div>
         <div className="flex items-center gap-3">
-          {logo && (
+          {logo ? (
             <img
               src={logo}
               alt={`${job.company} logo`}
@@ -56,6 +56,13 @@ const ExperienceEntry = ({ job }: ExperienceEntryProps) => {
               loading="lazy"
               className="h-10 w-10 shrink-0 rounded-lg border border-line bg-white object-contain p-1"
             />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-line bg-surface font-display text-base font-semibold text-accent"
+            >
+              {job.company.charAt(0)}
+            </span>
           )}
           <h3 className="font-display text-lg font-semibold text-ink">
             {job.title}{' '}
