@@ -8,13 +8,9 @@ import {
   Contact,
 } from '../components/portfolio';
 
-const SectionDivider = () => (
-  <div className="section-divider" aria-hidden="true" />
-);
-
 export const Portfolio = () => {
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-background text-ink">
       <Navigation />
 
       <main>
@@ -22,31 +18,21 @@ export const Portfolio = () => {
           <Hero />
         </section>
 
-        <SectionDivider />
-
         <section id="about">
           <About />
         </section>
-
-        <SectionDivider />
 
         <section id="projects">
           <Projects />
         </section>
 
-        <SectionDivider />
-
         <section id="skills">
           <Skills />
         </section>
 
-        <SectionDivider />
-
         <section id="experience">
           <Experience />
         </section>
-
-        <SectionDivider />
 
         <section id="contact">
           <Contact />
