@@ -4,11 +4,41 @@ import {
   Boxes,
   Cloud,
   Database,
+  Github,
+  Globe,
   LayoutPanelTop,
+  Linkedin,
   Mail,
   MapPin,
   ScanSearch,
 } from 'lucide-react';
+
+const footerLinks = [
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/in/gabriel-ghoussoub',
+    icon: Linkedin,
+    external: true,
+  },
+  {
+    label: 'GitHub',
+    href: 'https://github.com/GabrielGhsoub',
+    icon: Github,
+    external: true,
+  },
+  {
+    label: 'Email',
+    href: 'mailto:ghoussoubgabriel@gmail.com?subject=Contract%20engineering%20enquiry',
+    icon: Mail,
+    external: false,
+  },
+  {
+    label: 'gabrielghsoub.com',
+    href: '/',
+    icon: Globe,
+    external: false,
+  },
+];
 
 const ease = [0.21, 0.47, 0.32, 0.98] as [number, number, number, number];
 
@@ -49,11 +79,6 @@ const domains = [
     detail:
       'Blom Bank, plus e-wallet and fee processing for a national ID programme',
   },
-  {
-    domain: 'Property and casualty insurance',
-    detail:
-      'Current engagement, carrier platform work on Java/Spring and React',
-  },
 ];
 
 const services = [
@@ -63,7 +88,7 @@ const services = [
     description:
       'Monolith to microservices, without a rewrite that never lands. Strangler-fig migrations, rules-engine extraction, reactive re-architecture.',
     proof:
-      'Migrated a monolithic health-insurance claims application with an embedded rules engine onto a BPM platform and reactive Spring WebFlux microservices. Deployment time went from four hours to fifteen minutes.',
+      'Spent 19 months on the team that moved a monolithic health-insurance claims application, with an embedded rules engine, onto a BPM platform and reactive Spring WebFlux microservices. Deployment time went from four hours to fifteen minutes.',
   },
   {
     icon: LayoutPanelTop,
@@ -537,19 +562,50 @@ export const Hire = () => {
                 className="mt-8 inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 font-medium text-background hover:bg-accent-bright transition-colors"
               >
                 <Mail size={16} aria-hidden="true" />
-                ghoussoubgabriel@gmail.com
+                Get in touch
               </a>
             </motion.div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-line py-8">
-        <div className="container max-w-5xl mx-auto px-6 text-center font-mono text-xs text-ink-muted">
-          Gabriel Ghoussoub · Beirut, Lebanon ·{' '}
-          <a href="/" className="hover:text-accent transition-colors">
-            gabrielghsoub.com
-          </a>
+      <footer className="border-t border-line">
+        <div className="container max-w-5xl mx-auto px-6 py-10">
+          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="font-display font-semibold text-ink">
+                Gabriel Ghoussoub
+              </div>
+              <div className="mt-1 font-mono text-xs text-ink-muted">
+                Beirut, Lebanon · UTC+2 · Remote worldwide
+              </div>
+            </div>
+
+            <nav
+              aria-label="Contact and profiles"
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2"
+            >
+              {footerLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noreferrer noopener' : undefined}
+                    className="inline-flex items-center gap-2 font-mono text-xs text-ink-secondary hover:text-accent transition-colors"
+                  >
+                    <Icon size={14} aria-hidden="true" />
+                    {link.label}
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="mt-8 border-t border-line pt-6 text-center font-mono text-xs text-ink-muted">
+            Available for project-based contract work
+          </div>
         </div>
       </footer>
     </div>
