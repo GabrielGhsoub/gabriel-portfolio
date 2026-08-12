@@ -50,7 +50,7 @@ export const skills = {
 export const experience = [
   {
     title: 'Software Engineer',
-    company: 'Speedlane',
+    company: 'Client confidential',
     period: 'Aug. 2025 – Present',
     highlights: [
       'Engineered scalable backend services and RESTful/GraphQL APIs using Node.js, TypeScript, Elixir, and NestJS, supporting high-throughput distributed systems.',
