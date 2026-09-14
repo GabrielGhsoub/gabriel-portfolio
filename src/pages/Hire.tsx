@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
+  Bot,
   Boxes,
   Cloud,
   Database,
@@ -83,6 +84,14 @@ const domains = [
 
 const services = [
   {
+    icon: Bot,
+    title: 'AI engineering and agent integration',
+    description:
+      'LLM features, retrieval, tool orchestration and multi-agent workflows built into real products, with the tests and review that AI-generated code needs before it ships.',
+    proof:
+      'Claude Code is part of my daily practice. I build with the Claude and OpenAI APIs and LangChain, and I have shipped MCP servers and multi-agent tooling of my own. I know where agent output is reliable and where it quietly is not, which is most of the job.',
+  },
+  {
     icon: Boxes,
     title: 'Legacy modernisation',
     description:
@@ -144,10 +153,10 @@ const engagements = [
     best: 'A portal, platform, or modernisation programme end to end.',
   },
   {
-    model: 'Retained advisory',
-    shape: 'Monthly, capped hours',
-    duration: 'Ongoing',
-    best: 'A team that needs senior review, not another pair of hands.',
+    model: 'Embedded part-time',
+    shape: 'Hourly or monthly, 10 to 30 hrs/week',
+    duration: '1 to 6 months',
+    best: 'A senior full-stack engineer inside your team for a defined stretch, AI tooling included.',
   },
 ];
 
@@ -179,6 +188,11 @@ const principles = [
 
 const stack = [
   {
+    group: 'AI',
+    items:
+      'Claude Code · Claude API · OpenAI · LangChain · MCP · multi-agent systems',
+  },
+  {
     group: 'Backend',
     items:
       'Java · Spring Boot · Spring WebFlux · NestJS · Node.js · GraphQL · Elixir',
@@ -192,10 +206,6 @@ const stack = [
   {
     group: 'Cloud',
     items: 'AWS · Terraform · Kubernetes · Docker · Helm · GitLab CI · Jenkins',
-  },
-  {
-    group: 'AI',
-    items: 'Claude API · OpenAI · LangChain · multi-agent systems',
   },
 ];
 
@@ -262,20 +272,22 @@ export const Hire = () => {
                 variants={itemVariants}
                 className="font-display text-4xl md:text-6xl font-semibold tracking-tight text-ink"
               >
-                Engineering for
+                Full-stack engineer,
                 <br />
-                <span className="text-accent">regulated systems</span>
+                <span className="text-accent">AI-native</span>
               </motion.h1>
 
               <motion.p
                 variants={itemVariants}
                 className="mt-6 max-w-2xl text-lg text-ink-secondary leading-relaxed"
               >
-                I build production software for insurers, banks, and government:
-                domains where correctness, auditability, and uptime are
-                contractual rather than aspirational. Five years across two
-                major insurance carriers, a national digital identity programme,
-                a commercial bank, and a satellite network operator.
+                I build production software in Java/Spring Boot and TypeScript,
+                and I build with AI coding agents every day: Claude Code in the
+                loop, MCP servers and multi-agent tooling of my own, LLM
+                features wired into real products. Five years on systems where a
+                bug is an audit finding: two US insurance carriers, a national
+                digital identity programme, a commercial bank, a satellite
+                network operator. That is the proof, not the pitch.
               </motion.p>
 
               <motion.div
@@ -316,10 +328,11 @@ export const Hire = () => {
                 variants={itemVariants}
                 className="mb-10 max-w-2xl text-ink-secondary leading-relaxed"
               >
-                Companies whose software carries regulatory, financial, or
-                safety weight, where a bug is not a bad review but an audit
-                finding. I do not need the domain explained to me, and that is
-                most of what you are buying.
+                Teams that want to ship faster with AI without shipping
+                something they cannot stand behind: startups building AI
+                products, and companies whose software carries regulatory or
+                financial weight. I do not need the domain explained to me, and
+                I do not need the tooling explained either.
               </motion.p>
 
               <div className="grid gap-3">
