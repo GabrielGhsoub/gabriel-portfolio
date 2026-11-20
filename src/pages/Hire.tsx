@@ -444,7 +444,7 @@ export const Hire = () => {
                 <div>
                   <div className="font-mono text-xs text-ink-muted">Rate</div>
                   <div className="mt-1 font-display text-2xl font-semibold text-ink">
-                    $75
+                    $25
                     <span className="text-accent">/hr</span>
                   </div>
                   <div className="mt-1 text-xs text-ink-muted">
